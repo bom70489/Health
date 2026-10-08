@@ -5,19 +5,19 @@ This repository contains the working Expo SDK 57 app, synthetic local demo, Supa
 ## First run
 
 ```sh
-git clone https://github.com/SingleplayerGG/gan-health-companion.git gan-health-companion
+git clone YOUR_GITHUB_REPOSITORY_URL gan-health-companion
 cd gan-health-companion
 npm ci
 npx expo start
 ```
 
-Use the actual GitHub URL. On Windows PowerShell, substitute `npm.cmd` / `npx.cmd` if script policy blocks the standard commands. Open the cloned folder in Codex. No credentials are needed for Demo Mode: select the doctor, manage a patient through Account, then switch to patient A through Account settings. Changes persist locally. See `DEMO_SCRIPT.md`.
+Replace `YOUR_GITHUB_REPOSITORY_URL` with the repository URL. On Windows PowerShell, substitute `npm.cmd` / `npx.cmd` if script policy blocks the standard commands. Open the cloned folder in Codex. No credentials are needed for Demo Mode: select the doctor, manage a patient through Account, then switch to patient A through Account settings. Changes persist locally. See `DEMO_SCRIPT.md`.
 
 ## Current state
 
 Implemented: Thai navigation and role guards; calendar/next task/history; doctor patient search and appointment/medication CRUD forms; versioned orders, acknowledgments and dose confirmations; data-grounded read-only chat; preferences, notification planning and speech; persistent demo storage; Supabase adapter, migrations, RLS/RPCs, audit, seed tooling and Edge Functions.
 
-Latest verification on the current source: `npm ci` passed; TypeScript passed; **66 tests passed**; lint passed with **0 warnings**; Expo diagnostics **21/21 passed**; Expo compatibility check passed; Android and web exports passed; Playwright **1 passed** at 360×800. Android Expo Go skips importing the native notification module due an SDK/runtime import crash; use a development build to test device reminders. npm reported **29 dependency advisories**. The verification environment used Node 26.8.1/npm 12.1.0; README recommends Node 24 LTS. Physical Android, hosted Supabase and actual notification delivery remain untested. See `TEST_CHECKLIST.md` for details.
+Latest verification on the current source: `npm ci` passed previously; this rerun passed TypeScript, **66 tests**, lint with **0 warnings**, Expo diagnostics **21/21**, Expo compatibility check, Android/iOS/web exports and Playwright **1 passed** at 360×800. Android Expo Go skips importing the native notification module due an SDK/runtime import crash; use a development build to test device reminders. npm reported **29 dependency advisories**. The verification environment used Node 26.8.1/npm 12.1.0; README recommends Node 24 LTS. Physical Android/iOS, hosted Supabase and actual notification delivery remain untested. See `TEST_CHECKLIST.md` for details.
 
 ## Copy-paste Codex continuation prompt
 

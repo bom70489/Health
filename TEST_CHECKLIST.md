@@ -9,17 +9,18 @@ Last updated: 8 October 2026. Tests use fictional data only.
 | Dependency installation         | `npm ci`: **passed**, 858 packages installed; 29 advisories reported by npm                |
 | TypeScript                      | `npm run typecheck`: **passed**                                                             |
 | Unit and local PostgreSQL tests | `npm test`: **66 passed** across 8 files, including backend/PGlite tests                    |
-| Expo diagnostics                | `npx expo-doctor`: **21/21 passed**                                                         |
+| Expo diagnostics                | `npx expo-doctor`: **21/21 passed** on current source                                       |
 | Expo compatibility              | `npx expo install --check`: **passed**, dependencies up to date                             |
 | Android bundle                  | `npx expo export --platform android`: **passed** on current source                          |
+| iOS bundle                       | `npx expo export --platform ios`: **passed** on current source                               |
 | Web bundle                      | `npx expo export --platform web`: **passed** on current source                               |
-| Lint                            | `npm run lint`: **passed, 0 errors, 0 warnings** after removing four UTF-8 BOM markers      |
-| Browser end-to-end              | `npm run test:ui`: **1 passed** on current source, 360×800 viewport                         |
+| Lint                            | `npm run lint`: **passed, 0 errors, 0 warnings** on current source                          |
+| Browser end-to-end              | `npm run test:ui`: **1 passed** against built web output, 360×800 viewport                  |
 | Deno                            | Previous recorded backend checks/tests: **2 passed**; not rerun this session                |
 
 Current verification ran on Node **26.8.1** and npm **12.1.0** (the README recommends Node 24 LTS). Web and Android exports are bundle checks, not native device validation. The browser journey covered doctor order creation, patient confirmation/chat, route guarding and persistence; native/cloud delivery is not implied.
 
-The notification service tests include a regression that verifies Android Expo Go never imports `expo-notifications` and displays the development-build requirement. The completed browser journey verified doctor forms/validation, persisted orders, patient switch, confirmation of one dose only, next-task advancement, live chat answers, doctor deep-link denial, reload persistence and separation from patient B. The current rerun used a 360×800 viewport. Earlier failed preliminary runs are not counted as passed. Native/cloud delivery is not implied by these results.
+The notification service tests include a regression that verifies Android Expo Go never imports `expo-notifications` and displays the development-build requirement. The completed browser journey verified doctor forms/validation, persisted orders, patient switch, confirmation of one dose only, next-task advancement, live chat answers, doctor deep-link denial, reload persistence and separation from patient B. The current rerun used a 360×800 viewport and completed against the static web export. Earlier failed preliminary runs are not counted as passed. Native/cloud delivery is not implied by these results.
 
 ## Automated behavior covered
 

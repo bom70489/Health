@@ -1,19 +1,25 @@
 # กรร | AI Health Companion
 
-Thai-first Android prototype built from [the authoritative master brief](docs/GAN_CODEX_MASTER_BRIEF.md). One Expo + React Native + TypeScript app, with Expo Router and a permanent left rail: **กรร / ปฏิทิน / บัญชี**. Use fictional data only. See [HANDOFF.md](HANDOFF.md) to continue with Codex on another laptop.
+Thai-first Android-first prototype built from [the authoritative master brief](docs/GAN_CODEX_MASTER_BRIEF.md). One Expo + React Native + TypeScript app, with Expo Router and a permanent left rail: **กรร / ปฏิทิน / บัญชี**. It has JavaScript bundle exports for Android, iOS and web. Use fictional data only. See [HANDOFF.md](HANDOFF.md) to continue with Codex on another laptop.
+
+## Completion status
+
+The functional prototype work is complete: demo doctor-to-patient flows, persistent synthetic data, role guards, appointment and medication management, dose self-reporting, calendar tasks and read-only schedule chat are implemented. The latest automated checks are recorded in [TEST_CHECKLIST.md](TEST_CHECKLIST.md): 66 tests pass, typecheck/lint/Expo diagnostics pass, Android/iOS/web bundles export, and the browser journey passes at 360×800.
+
+This means the app builds and its tested demo journey works in the listed environments. It does **not** mean it has been verified on every device or is ready for clinical use. Physical Android/iOS behavior, native reminders/speech, hosted Supabase authentication and remote push still need the device/cloud checks below.
 
 ## Clone and run on another laptop
 
 Requires Git, Node.js 24 LTS and npm. Install the exact locked dependencies:
 
 ```sh
-git clone https://github.com/SingleplayerGG/gan-health-companion.git gan-health-companion
+git clone YOUR_GITHUB_REPOSITORY_URL gan-health-companion
 cd gan-health-companion
 npm ci
 npx expo start
 ```
 
-Replace the URL with this project's GitHub URL. If PowerShell blocks `npm.ps1` or `npx.ps1`, use `npm.cmd` / `npx.cmd`. Open this cloned folder as the Codex workspace; do not scaffold a new app. Demo Mode needs no `.env` or cloud credentials.
+Replace `YOUR_GITHUB_REPOSITORY_URL` with your repository URL. If PowerShell blocks `npm.ps1` or `npx.ps1`, use `npm.cmd` / `npx.cmd`. Open this cloned folder as the Codex workspace; do not scaffold a new app. Demo Mode needs no `.env` or cloud credentials.
 
 Scan the QR code using an Expo Go release compatible with SDK 57, or press `a` with an Android emulator installed. If a matching Expo Go runtime is unavailable, use the development build below. For the browser preview:
 
