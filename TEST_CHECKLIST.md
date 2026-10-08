@@ -16,11 +16,12 @@ Last updated: 8 October 2026. Tests use fictional data only.
 | Web bundle                      | `npx expo export --platform web`: **passed** on current source                               |
 | Lint                            | `npm run lint`: **passed, 0 errors, 0 warnings** on current source                          |
 | Browser end-to-end              | `npm run test:ui`: **1 passed** against built web output, 360×800 viewport                  |
+| Responsive browser sweep        | Calendar/chat/account at **280, 320, 360, 390, 430 and 480px**: no page-width overflow; doctor appointment/medication forms at **280px**: no overflow |
 | Deno                            | Previous recorded backend checks/tests: **2 passed**; not rerun this session                |
 
-Current verification ran on Node **26.8.1** and npm **12.1.0** (the README recommends Node 24 LTS). Web and Android exports are bundle checks, not native device validation. The browser journey covered doctor order creation, patient confirmation/chat, route guarding and persistence; native/cloud delivery is not implied.
+Current verification ran on Node **26.8.1** and npm **12.1.0** (the README recommends Node 24 LTS). Android, iOS and web exports are bundle checks, not native device validation. The browser journey covered doctor order creation, patient confirmation/chat, route guarding and persistence; native/cloud delivery is not implied.
 
-The notification service tests include a regression that verifies Android Expo Go never imports `expo-notifications` and displays the development-build requirement. The completed browser journey verified doctor forms/validation, persisted orders, patient switch, confirmation of one dose only, next-task advancement, live chat answers, doctor deep-link denial, reload persistence and separation from patient B. The current rerun used a 360×800 viewport and completed against the static web export. Earlier failed preliminary runs are not counted as passed. Native/cloud delivery is not implied by these results.
+The notification service tests include a regression that verifies Android Expo Go never imports `expo-notifications` and displays the development-build requirement. The completed browser journey verified doctor forms/validation, persisted orders, patient switch, confirmation of one dose only, next-task advancement, live chat answers, doctor deep-link denial, reload persistence and separation from patient B. The current rerun used a 360×800 viewport and completed against the static web export. A separate responsive sweep used 280, 320, 360, 390, 430 and 480 CSS-pixel viewports for patient calendar, chat and account; doctor appointment and medication forms were inspected at 280px. No page-level horizontal overflow or browser errors were found. Earlier failed preliminary runs are not counted as passed. This browser check does not prove native layout behavior on every device.
 
 ## Automated behavior covered
 
@@ -35,6 +36,7 @@ The notification service tests include a regression that verifies Android Expo G
 ## Device and hosted checks still required
 
 - [ ] Install on Android; inspect 360dp width, system font scaling, native date/time controls, back navigation and keyboard/composer behavior.
+- [ ] Verify the narrow-width layouts on physical Android/iOS phones; web viewport coverage is not native-device coverage.
 - [ ] Test Thai read-aloud with/without installed Thai voices and audio stop.
 - [ ] Local notifications in a development build: permission granted/denied, due dose, one-day-before appointment, changed/cancelled orders, logout, background, lockscreen and reboot. Android Expo Go deliberately skips the native notification module because its import crashes in this SDK/runtime combination; the app keeps its in-app reminder list available.
 - [ ] Hosted Supabase: private synthetic Auth users, migrations, cross-device refresh, direct PostgREST permission checks via `tests/supabase-live.mjs`, deployed assistant JWT enforcement and current-record answers.

@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,6 +16,10 @@ import { canUseNotificationModule } from "../../src/services/notifications";
 export default function AppLayout() {
   const { user, loading, mode, refresh, error } = useApp(),
     path = usePathname();
+  const { width } = useWindowDimensions();
+  const compact = width <= 360;
+  const railWidth =
+    width <= 320 ? 52 : width <= 360 ? 58 : width <= 430 ? 64 : 70;
   useEffect(() => {
     void refresh();
   }, [path, refresh]);
@@ -69,10 +74,10 @@ export default function AppLayout() {
       accessibilityState={{ selected: active === id }}
       testID={`rail-${id}`}
       onPress={() => router.replace(`/${id}` as any)}
-      style={[s.item, active === id && s.active]}
+      style={[s.item, compact && s.itemCompact, active === id && s.active]}
     >
       {id === "assistant" ? (
-        <GanAvatar size={35} />
+        <GanAvatar size={compact ? 30 : 35} />
       ) : (
         <Ionicons
           name={icon}
@@ -82,7 +87,7 @@ export default function AppLayout() {
       )}
       <Txt
         style={{
-          fontSize: 12,
+          fontSize: compact ? 10 : 12,
           color: active === id ? "white" : colors.text,
           fontWeight: "700",
           textAlign: "center",
@@ -95,7 +100,12 @@ export default function AppLayout() {
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.shell}>
-        <View style={s.rail}>
+        <View
+          style={[
+            s.rail,
+            { width: railWidth, paddingHorizontal: compact ? 2 : 5 },
+          ]}
+        >
           {item("assistant", "กรร", "calendar-outline")}
           {item("calendar", "ปฏิทิน", "calendar-outline")}
           <View style={{ flex: 1 }} />
@@ -141,8 +151,6 @@ const s = StyleSheet.create({
     alignSelf: "center",
   },
   rail: {
-    width: 70,
-    paddingHorizontal: 5,
     paddingTop: 22,
     paddingBottom: 12,
     gap: 14,
@@ -159,6 +167,7 @@ const s = StyleSheet.create({
     justifyContent: "center",
     gap: 7,
   },
+  itemCompact: { minHeight: 68, paddingVertical: 7, gap: 5 },
   active: { backgroundColor: colors.primary },
   pane: { flex: 1, minWidth: 0 },
   demo: {
