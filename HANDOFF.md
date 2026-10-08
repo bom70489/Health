@@ -17,9 +17,7 @@ Use the actual GitHub URL. On Windows PowerShell, substitute `npm.cmd` / `npx.cm
 
 Implemented: Thai navigation and role guards; calendar/next task/history; doctor patient search and appointment/medication CRUD forms; versioned orders, acknowledgments and dose confirmations; data-grounded read-only chat; preferences, notification planning and speech; persistent demo storage; Supabase adapter, migrations, RLS/RPCs, audit, seed tooling and Edge Functions.
 
-Latest recorded checks: **65 unit/local PostgreSQL tests passed**, including **17 backend tests**; TypeScript passed; lint **0 errors, 4 BOM warnings**; Expo diagnostics **21/21 passed**; Deno **2 passed**. Playwright: **1 passed in 33.2 seconds**, at 360×800 with large fonts.
-
-The successful Playwright run and Android/web exports were **before the final calendar helper/pagination changes**. Rerun browser and exports on the cloned revision before treating them as verification of the latest files. Physical Android, hosted Supabase and actual notification delivery remain untested. See `TEST_CHECKLIST.md`.
+Latest verification on the current source: `npm ci` passed; TypeScript passed; **66 tests passed**; lint passed with **0 warnings**; Expo diagnostics **21/21 passed**; Expo compatibility check passed; Android and web exports passed; Playwright **1 passed** at 360×800. Android Expo Go skips importing the native notification module due an SDK/runtime import crash; use a development build to test device reminders. npm reported **29 dependency advisories**. The verification environment used Node 26.8.1/npm 12.1.0; README recommends Node 24 LTS. Physical Android, hosted Supabase and actual notification delivery remain untested. See `TEST_CHECKLIST.md` for details.
 
 ## Copy-paste Codex continuation prompt
 
@@ -29,9 +27,9 @@ Read AGENTS.md, HANDOFF.md and docs/GAN_CODEX_MASTER_BRIEF.md completely;
 inspect every ui-references image, then read README.md and TEST_CHECKLIST.md.
 Follow the master brief as authoritative. Do not scaffold a replacement app.
 
-Install locked dependencies with npm ci. Run typecheck, tests, lint, Expo diagnostics,
-Android/web exports and Playwright. Previous browser/export results predate the
-last calendar helper/pagination edits, so verify the current revision and fix failures.
+Install locked dependencies with npm ci. Re-run typecheck, tests, lint, Expo diagnostics,
+Android/web exports and Playwright after source changes. The latest calendar helper and
+pagination revision has passed those checks; device/cloud validations are still outstanding.
 
 Then prioritize Android native/device validation, Supabase migrations/Auth seed/RLS
 and cross-device cloud validation, and real notification/speech tests. Preserve the
@@ -48,7 +46,7 @@ Read order: `AGENTS.md` → this file → complete master brief → reference im
 
 ## Next priorities
 
-1. Verify the latest source, then install an Android development build. Test native pickers, keyboard/composer, large system fonts, navigation and Thai speech.
+1. Install an Android development build. Test native pickers, keyboard/composer, large system fonts, navigation and Thai speech.
 2. Provision your own Supabase project and private synthetic Auth accounts. Apply all migrations in filename order and follow `supabase/seed/README.md`. Test cross-device updates and direct permissions with `tests/supabase-live.mjs`.
 3. Test local reminders on Android, then configure EAS/FCM and server secrets for remote delivery. Verify changes/cancellations, duplicates, logout, background and lockscreen behavior on a real device.
 4. Review **29 dependency advisories** against compatible patched releases. Assess proposed SDK changes before any force fix.

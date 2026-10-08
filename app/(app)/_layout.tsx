@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import {
   ActivityIndicator,
-  Platform,
   Pressable,
   StyleSheet,
   View,
@@ -11,6 +10,7 @@ import { Redirect, Slot, router, usePathname } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useApp } from "../../src/providers/AppProvider";
 import { GanAvatar, Txt, colors } from "../../src/components/ui";
+import { canUseNotificationModule } from "../../src/services/notifications";
 
 export default function AppLayout() {
   const { user, loading, mode, refresh, error } = useApp(),
@@ -19,7 +19,7 @@ export default function AppLayout() {
     void refresh();
   }, [path, refresh]);
   useEffect(() => {
-    if (Platform.OS === "web" || !user) return;
+    if (!canUseNotificationModule() || !user) return;
     let closed = false;
     let cleanup: (() => void) | undefined;
     void import("expo-notifications")

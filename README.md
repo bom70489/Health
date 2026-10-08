@@ -30,7 +30,7 @@ No `.env` is required for demo mode. Login buttons select the doctor or one of t
 - Appointment acknowledgment applies to the current version and is distinct from attendance. Doctor edits invalidate it. Medication edits create new versions; historical confirmations remain separate.
 - Assistant: suggested prompts and typed Thai questions retrieve the same saved schedules and confirmation state. It refuses to change orders, exposes no other patient's records, and honestly reports that verified drug side-effect references are absent.
 - Account: read-only profile/contact details, notification permission, three font sizes, demo account switching, test clock and explicit reset. Doctor routes require the doctor role even when opened directly.
-- Local reminders: neutral lockscreen text, medication occurrences and one-day-before appointments, cancellation/rescheduling on sync and account switch. Permission denial is explained. Notifications are separate from confirmation of medication ingestion.
+- Local reminders: neutral lockscreen text, medication occurrences and one-day-before appointments, cancellation/rescheduling on sync and account switch. Permission denial is explained. Notifications are separate from confirmation of medication ingestion. On Android Expo Go, the app skips the native notification module to avoid an Expo SDK 57 import crash; use an Android development build to test device reminders. The calendar and its in-app reminder list remain available in Expo Go.
 - Thai read-aloud uses available device voices; missing Thai speech support is reported.
 
 ## Supabase mode

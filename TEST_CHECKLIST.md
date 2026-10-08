@@ -6,18 +6,20 @@ Last updated: 8 October 2026. Tests use fictional data only.
 
 | Check                           | Recorded outcome                                                                             |
 | ------------------------------- | -------------------------------------------------------------------------------------------- |
-| Dependency installation         | Expo SDK 57 matched packages installed; lockfile present                                     |
-| TypeScript                      | Latest recorded `tsc --noEmit`: **passed**                                                  |
-| Unit and local PostgreSQL tests | Latest completed run: **65 passed**, including **17 backend tests**                         |
-| Expo diagnostics                | **21/21 passed**, after adding required expo-font                                            |
-| Expo compatibility              | `expo install --check`: dependencies up to date                                              |
-| Android bundle                  | Export **passed** before final calendar helper/pagination edits; latest source needs rerun  |
-| Web bundle                      | Export **passed** before final calendar helper/pagination edits; latest source needs rerun  |
-| Lint                            | Latest recorded run: **0 errors, 4 BOM warnings**                                           |
-| Browser end-to-end              | **1 passed in 33.2 seconds**, before final calendar helper/pagination edits; rerun latest    |
-| Deno                            | Backend checks/tests recorded **2 passed**                                                 |
+| Dependency installation         | `npm ci`: **passed**, 858 packages installed; 29 advisories reported by npm                |
+| TypeScript                      | `npm run typecheck`: **passed**                                                             |
+| Unit and local PostgreSQL tests | `npm test`: **66 passed** across 8 files, including backend/PGlite tests                    |
+| Expo diagnostics                | `npx expo-doctor`: **21/21 passed**                                                         |
+| Expo compatibility              | `npx expo install --check`: **passed**, dependencies up to date                             |
+| Android bundle                  | `npx expo export --platform android`: **passed** on current source                          |
+| Web bundle                      | `npx expo export --platform web`: **passed** on current source                               |
+| Lint                            | `npm run lint`: **passed, 0 errors, 0 warnings** after removing four UTF-8 BOM markers      |
+| Browser end-to-end              | `npm run test:ui`: **1 passed** on current source, 360×800 viewport                         |
+| Deno                            | Previous recorded backend checks/tests: **2 passed**; not rerun this session                |
 
-The completed browser journey verified doctor forms/validation, persisted orders, patient switch, confirmation of one dose only, next-task advancement, live chat answers, doctor deep-link denial, reload persistence and separation from patient B. Screens were inspected at 360×800 with 1.3 font size. Earlier failed preliminary runs are not counted as passed. Browser and export results predate the final calendar helper/pagination changes; rerun those checks on the latest revision. Native/cloud delivery is not implied by these results.
+Current verification ran on Node **26.8.1** and npm **12.1.0** (the README recommends Node 24 LTS). Web and Android exports are bundle checks, not native device validation. The browser journey covered doctor order creation, patient confirmation/chat, route guarding and persistence; native/cloud delivery is not implied.
+
+The notification service tests include a regression that verifies Android Expo Go never imports `expo-notifications` and displays the development-build requirement. The completed browser journey verified doctor forms/validation, persisted orders, patient switch, confirmation of one dose only, next-task advancement, live chat answers, doctor deep-link denial, reload persistence and separation from patient B. The current rerun used a 360×800 viewport. Earlier failed preliminary runs are not counted as passed. Native/cloud delivery is not implied by these results.
 
 ## Automated behavior covered
 
@@ -33,14 +35,16 @@ The completed browser journey verified doctor forms/validation, persisted orders
 
 - [ ] Install on Android; inspect 360dp width, system font scaling, native date/time controls, back navigation and keyboard/composer behavior.
 - [ ] Test Thai read-aloud with/without installed Thai voices and audio stop.
-- [ ] Local notifications: permission granted/denied, due dose, one-day-before appointment, changed/cancelled orders, logout, background, lockscreen and reboot.
+- [ ] Local notifications in a development build: permission granted/denied, due dose, one-day-before appointment, changed/cancelled orders, logout, background, lockscreen and reboot. Android Expo Go deliberately skips the native notification module because its import crashes in this SDK/runtime combination; the app keeps its in-app reminder list available.
 - [ ] Hosted Supabase: private synthetic Auth users, migrations, cross-device refresh, direct PostgREST permission checks via `tests/supabase-live.mjs`, deployed assistant JWT enforcement and current-record answers.
 - [ ] Remote push: EAS development build + FCM, token registration/unlink, Cron/Vault secrets, current-version dedupe and actual physical-device receipt.
 - [ ] Review with older Thai users and clinicians before any broader use. Confirmations are self-report, not verified ingestion or attendance.
 
 ## Dependency audit
 
-`npm audit` reports **29 advisories: 19 high, 10 moderate**, inherited through the SDK toolchain/its dependency graph. Reported paths include node-forge, braces/micromatch, decode-uri-component/query-string and uuid/xcode. Suggested force fixes downgrade Expo/React Native or cross SDK major versions, so they were not applied. Do not treat this as a security-clean production release. Recheck patched compatible package releases before distribution.
+`npm audit` reports **29 advisories: 19 high, 10 moderate** across four transitive dependency paths: Expo Metro → micromatch → `braces@3.0.3`; Expo Router → query-string → `decode-uri-component@0.2.2`; Expo CLI → `node-forge@1.4.0`; and Expo config plugins → xcode → `uuid@7.0.3`.
+
+Reviewed the current upstream advisories on 8 October 2026. The braces and node-forge advisories list **no patched upstream release** yet. decode-uri-component has a fix in 0.5.0, but Expo Router currently depends on query-string 7.1.3 and 0.2.2; replacing that nested package needs compatibility testing. uuid's advisory fix is in 14.0.0+, while xcode 3.0.1 currently resolves uuid 7.0.3; changing its major version needs API/build validation. `npm audit` only proposes force fixes that move Expo to 44.0.6 or Expo Router to 58.0.16, so no automated or SDK-crossing upgrade was applied. These toolchain findings still need reassessment before distribution; do not treat the project as security-clean.
 
 ## Reproduce
 

@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   >(),
   granted: true,
   mode: "demo",
+  executionEnvironment: "standalone",
   nextId: 0,
   schedule: vi.fn(),
   cancel: vi.fn(),
@@ -31,7 +32,9 @@ vi.mock("@react-native-async-storage/async-storage", () => ({
 }));
 vi.mock("expo-constants", () => ({
   default: {
-    executionEnvironment: "standalone",
+    get executionEnvironment() {
+      return mocks.executionEnvironment;
+    },
     easConfig: { projectId: "test-project" },
   },
   ExecutionEnvironment: { StoreClient: "storeClient" },
@@ -55,7 +58,10 @@ vi.mock("../src/data/SupabaseRepository", () => ({
   registerDeviceToken: mocks.register,
   unregisterDeviceTokens: mocks.unregister,
 }));
-vi.mock("expo-notifications", () => ({
+vi.mock("expo-notifications", () => {
+  if (mocks.executionEnvironment === "storeClient")
+    throw new Error("expo-notifications must not load in Android Expo Go");
+  return {
   AndroidImportance: { HIGH: 4 },
   AndroidNotificationVisibility: { PRIVATE: 0 },
   IosAuthorizationStatus: { PROVISIONAL: 3 },
@@ -68,7 +74,8 @@ vi.mock("expo-notifications", () => ({
   scheduleNotificationAsync: mocks.schedule,
   cancelScheduledNotificationAsync: mocks.cancel,
   getExpoPushTokenAsync: async () => ({ data: "ExponentPushToken[test]" }),
-}));
+  };
+});
 
 const NOW = new Date("2026-10-08T02:00:00Z");
 const PATIENT = DEMO_USERS.find((user) => user.id === "patient-a")!;
@@ -84,6 +91,7 @@ describe("notification service scheduling and honest status", () => {
     mocks.native.clear();
     mocks.granted = true;
     mocks.mode = "demo";
+    mocks.executionEnvironment = "standalone";
     mocks.nextId = 0;
     mocks.register.mockResolvedValue(undefined);
     mocks.unregister.mockResolvedValue(undefined);
@@ -180,5 +188,14 @@ describe("notification service scheduling and honest status", () => {
       "ลงทะเบียนการเตือนจากเซิร์ฟเวอร์ไม่สำเร็จ",
     );
     expect(service.getReminderStatus()).toContain("ตั้งการเตือนบนเครื่อง");
+  });
+
+  it("does not load expo-notifications in Android Expo Go", async () => {
+    mocks.executionEnvironment = "storeClient";
+    const service = await import("../src/services/notifications");
+    await service.syncReminders(createDemoSeed(NOW), PATIENT, NOW);
+    expect(service.canUseNotificationModule()).toBe(false);
+    expect(service.getReminderStatus()).toContain("ต้องใช้ development build");
+    expect(mocks.schedule).not.toHaveBeenCalled();
   });
 });

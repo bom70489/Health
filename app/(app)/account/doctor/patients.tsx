@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Pressable, View } from "react-native";
 import { router } from "expo-router";
 import {

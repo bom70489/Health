@@ -1,4 +1,4 @@
-﻿import { Platform } from "react-native";
+import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants, { ExecutionEnvironment } from "expo-constants";
 import type { HealthData, Profile } from "../domain/types";
@@ -40,6 +40,25 @@ let remoteStatus = "";
 let publishedStatus = localStatus;
 const listeners = new Set<() => void>();
 
+function isAndroidExpoGo(): boolean {
+  return (
+    Platform.OS === "android" &&
+    Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+  );
+}
+
+export function canUseNotificationModule(): boolean {
+  return Platform.OS !== "web" && !isAndroidExpoGo();
+}
+
+function unavailableMessage(): string {
+  if (Platform.OS === "web")
+    return "บนเว็บใช้รายการเตือนในแอป เปิดบน Android เพื่อเปิดการแจ้งเตือน";
+  if (isAndroidExpoGo())
+    return "การแจ้งเตือนบนเครื่องต้องใช้ development build • ขณะนี้เปิดใน Expo Go";
+  return "เปิดบน Android เพื่อเปิดการแจ้งเตือน";
+}
+
 export function getReminderStatus(): string {
   return [localStatus, remoteStatus].filter(Boolean).join("\n");
 }
@@ -58,7 +77,7 @@ function status(local: string, remote = remoteStatus): void {
   listeners.forEach((listener) => listener());
 }
 async function api(): Promise<Notifications | null> {
-  return Platform.OS === "web" ? null : import("expo-notifications");
+  return canUseNotificationModule() ? import("expo-notifications") : null;
 }
 function enqueue<T>(action: () => Promise<T>): Promise<T> {
   const run = chain.catch(() => undefined).then(action);
@@ -169,12 +188,7 @@ export function clearReminders(): Promise<void> {
       const n = await api();
       if (n) await clearLocal(n);
       await clearRemote();
-      status(
-        Platform.OS === "web"
-          ? "บนเว็บใช้รายการเตือนในแอป"
-          : "ล้างรายการเตือนของบัญชีเดิมแล้ว",
-        "",
-      );
+      status(n ? "ล้างรายการเตือนของบัญชีเดิมแล้ว" : unavailableMessage(), "");
     } catch (error) {
       status(
         "ล้างการเตือนเดิมไม่สำเร็จ กรุณาลองอีกครั้ง",
@@ -254,10 +268,7 @@ async function registerRemote(
 async function synchronize({ data, user, now }: Context): Promise<void> {
   const n = await api();
   if (!n) {
-    status(
-      "บนเว็บใช้รายการเตือนในแอป เปิดบน Android เพื่อเปิดการแจ้งเตือน",
-      "",
-    );
+    status(unavailableMessage(), "");
     return;
   }
   if (!user || user.role !== "patient") {
@@ -425,10 +436,7 @@ export async function requestReminders(): Promise<string> {
   try {
     const n = await api();
     if (!n) {
-      status(
-        "บนเว็บใช้รายการเตือนในแอป เปิดบน Android เพื่อเปิดการแจ้งเตือน",
-        "",
-      );
+      status(unavailableMessage(), "");
       return getReminderStatus();
     }
     await configure(n);
