@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
   Modal,
   Platform,
   Pressable,
@@ -11,6 +13,10 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { Badge, Button, Card, Field, Txt, colors } from "@/src/components/ui";
 import { useApp } from "@/src/providers/AppProvider";
 import { Appointment, MedicationPlan, Profile } from "@/src/domain/types";
@@ -30,9 +36,9 @@ export const doctorStyles = StyleSheet.create({
   },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: 8 },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: colors.soft,
     alignItems: "center",
     justifyContent: "center",
@@ -58,32 +64,206 @@ export const mealLabels: Record<MedicationPlan["mealInstruction"], string> = {
   per_doctor: "ตามคำสั่งแพทย์",
 };
 
-export function ProfileCard({ profile }: { profile: Profile }) {
+const profileImageKey = (profileId: string) => `gan-profile-image:${profileId}`;
+
+export function ProfileCard({
+  profile,
+  editable = false,
+}: {
+  profile: Profile;
+  editable?: boolean;
+}) {
+  const { user } = useApp();
+  const [savedImage, setSavedImage] = useState<{
+    profileId: string;
+    uri: string;
+  } | null>(null);
+  const [imageBusy, setImageBusy] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const imageUri = savedImage?.profileId === profile.id ? savedImage.uri : null;
+
+  useEffect(() => {
+    let active = true;
+    if (!editable || user?.id !== profile.id) {
+      return () => {
+        active = false;
+      };
+    }
+    void AsyncStorage.getItem(profileImageKey(profile.id))
+      .then((uri) => {
+        if (active) {
+          setSavedImage(uri ? { profileId: profile.id, uri } : null);
+        }
+      })
+      .catch(() => {
+        if (active) setImageError("โหลดรูปโปรไฟล์ไม่สำเร็จ");
+      });
+    return () => {
+      active = false;
+    };
+  }, [editable, profile.id, user?.id]);
+
+  const chooseProfileImage = async () => {
+    try {
+      setImageError(null);
+      setImageBusy(true);
+      const selection = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        selectionLimit: 1,
+      });
+      if (selection.canceled || !selection.assets[0]) return;
+
+      const asset = selection.assets[0];
+      const side = Math.min(asset.width, asset.height);
+      const actions =
+        side > 0
+          ? [
+              {
+                crop: {
+                  originX: Math.floor((asset.width - side) / 2),
+                  originY: Math.floor((asset.height - side) / 2),
+                  width: side,
+                  height: side,
+                },
+              },
+              { resize: { width: 320, height: 320 } },
+            ]
+          : [{ resize: { width: 320, height: 320 } }];
+      const result = await manipulateAsync(asset.uri, actions, {
+        format: SaveFormat.JPEG,
+        compress: 0.72,
+        base64: true,
+      });
+      if (!result.base64) throw new Error("missing image data");
+
+      const uri = `data:image/jpeg;base64,${result.base64}`;
+      await AsyncStorage.setItem(profileImageKey(profile.id), uri);
+      setSavedImage({ profileId: profile.id, uri });
+    } catch {
+      setImageError("เพิ่มรูปไม่สำเร็จ กรุณาลองเลือกรูปอื่น");
+    } finally {
+      setImageBusy(false);
+    }
+  };
+
+  const removeProfileImage = async () => {
+    try {
+      setImageError(null);
+      setImageBusy(true);
+      await AsyncStorage.removeItem(profileImageKey(profile.id));
+      setSavedImage((current) =>
+        current?.profileId === profile.id ? null : current,
+      );
+    } catch {
+      setImageError("ลบรูปไม่สำเร็จ กรุณาลองอีกครั้ง");
+    } finally {
+      setImageBusy(false);
+    }
+  };
+
   return (
     <Card>
-      <View style={doctorStyles.stack}>
-        <View style={doctorStyles.avatar}>
-          <Txt
-            style={{ fontSize: 26, fontWeight: "700", color: colors.primary }}
-          >
-            {profile.role === "doctor" ? "✚" : profile.displayName.slice(0, 1)}
-          </Txt>
+      <View style={[doctorStyles.row, { alignItems: "center" }]}>
+        <View style={{ position: "relative", width: 72, height: 72 }}>
+          <View style={doctorStyles.avatar}>
+            {imageUri && editable && user?.id === profile.id ? (
+              <Image
+                accessibilityLabel={`รูปโปรไฟล์ของ ${profile.displayName}`}
+                source={{ uri: imageUri }}
+                resizeMode="cover"
+                style={{ width: 72, height: 72, borderRadius: 36 }}
+              />
+            ) : (
+              <Txt
+                style={{ fontSize: 26, fontWeight: "700", color: colors.primary }}
+              >
+                {profile.role === "doctor"
+                  ? "✚"
+                  : profile.displayName.slice(0, 1)}
+              </Txt>
+            )}
+          </View>
+          {editable && user?.id === profile.id ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                imageUri ? "เปลี่ยนรูปโปรไฟล์" : "เพิ่มรูปโปรไฟล์"
+              }
+              accessibilityState={{ disabled: imageBusy }}
+              disabled={imageBusy}
+              onPress={() => void chooseProfileImage()}
+              style={{
+                position: "absolute",
+                right: -8,
+                bottom: -8,
+                width: 48,
+                height: 48,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              testID="profile-image-pick"
+            >
+              <View
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 17,
+                  borderWidth: 3,
+                  borderColor: colors.surface,
+                  backgroundColor: colors.primary,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  elevation: 2,
+                }}
+              >
+                {imageBusy ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <Ionicons name="image-outline" size={17} color="white" />
+                )}
+              </View>
+            </Pressable>
+          ) : null}
         </View>
-        <Txt style={doctorStyles.title}>{profile.displayName}</Txt>
-        <Badge text={profile.role === "doctor" ? "แพทย์" : "ผู้ป่วย"} />
-        {profile.patientNumber ? (
-          <Txt style={doctorStyles.muted}>
-            HN {profile.patientNumber}
-            {profile.age ? ` • อายุ ${profile.age} ปี` : ""}
-          </Txt>
-        ) : null}
-        {profile.hospitalName ? (
-          <Txt style={doctorStyles.muted}>{profile.hospitalName}</Txt>
-        ) : null}
-        {profile.department ? (
-          <Txt style={doctorStyles.muted}>แผนก{profile.department}</Txt>
-        ) : null}
+        <View style={[doctorStyles.stack, { flex: 1, minWidth: 0, gap: 6 }]}>
+          <Txt style={doctorStyles.title}>{profile.displayName}</Txt>
+          <Badge text={profile.role === "doctor" ? "แพทย์" : "ผู้ป่วย"} />
+          {profile.patientNumber ? (
+            <Txt style={doctorStyles.muted}>
+              HN {profile.patientNumber}
+              {profile.age ? ` • อายุ ${profile.age} ปี` : ""}
+            </Txt>
+          ) : null}
+          {profile.hospitalName ? (
+            <Txt style={doctorStyles.muted}>{profile.hospitalName}</Txt>
+          ) : null}
+          {profile.department ? (
+            <Txt style={doctorStyles.muted}>แผนก{profile.department}</Txt>
+          ) : null}
+        </View>
       </View>
+      {editable && user?.id === profile.id ? (
+        <View style={{ gap: 8 }}>
+          {imageUri ? (
+            <Button
+              label="ลบรูปโปรไฟล์"
+              variant="secondary"
+              onPress={() => void removeProfileImage()}
+              disabled={imageBusy}
+              testID="profile-image-remove"
+            />
+          ) : null}
+          <Txt style={[doctorStyles.muted, { fontSize: 12 }]}>
+            แตะไอคอนรูปภาพเพื่อเพิ่มหรือเปลี่ยน รูปจะเก็บไว้ในอุปกรณ์นี้เท่านั้น
+          </Txt>
+          {imageError ? (
+            <Txt style={{ color: colors.red, fontSize: 14 }}>{imageError}</Txt>
+          ) : null}
+        </View>
+      ) : null}
     </Card>
   );
 }

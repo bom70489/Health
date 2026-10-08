@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -17,9 +17,10 @@ export default function AppLayout() {
   const { user, loading, mode, refresh, error } = useApp(),
     path = usePathname();
   const { width } = useWindowDimensions();
+  const [railOpen, setRailOpen] = useState(true);
   const compact = width <= 360;
   const railWidth =
-    width <= 320 ? 52 : width <= 360 ? 58 : width <= 430 ? 64 : 70;
+    width <= 320 ? 52 : width <= 360 ? 60 : width <= 430 ? 82 : 90;
   useEffect(() => {
     void refresh();
   }, [path, refresh]);
@@ -100,29 +101,61 @@ export default function AppLayout() {
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.shell}>
-        <View
-          style={[
-            s.rail,
-            { width: railWidth, paddingHorizontal: compact ? 2 : 5 },
-          ]}
-        >
-          {item("assistant", "กรร", "calendar-outline")}
-          {item("calendar", "ปฏิทิน", "calendar-outline")}
-          <View style={{ flex: 1 }} />
-          {item("account", "บัญชี", "person-outline")}
-        </View>
+        {railOpen && (
+          <View
+            style={[
+              s.rail,
+              { width: railWidth, paddingHorizontal: compact ? 2 : 5 },
+            ]}
+          >
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="ซ่อนแถบเมนู"
+              testID="rail-toggle-close"
+              onPress={() => setRailOpen(false)}
+              style={s.railToggle}
+            >
+              <View style={s.railToggleIcon}>
+                <Ionicons name="chevron-back" size={19} color={colors.primaryDark} />
+              </View>
+            </Pressable>
+            {item("assistant", "กรร", "calendar-outline")}
+            {item("calendar", "ปฏิทิน", "calendar-outline")}
+            <View style={{ flex: 1 }} />
+            <View style={s.accountDivider} />
+            {item("account", "บัญชี", "person-outline")}
+          </View>
+        )}
         <View style={s.pane}>
-          {mode === "demo" && (
-            <View style={s.demo}>
-              <Txt
-                style={{
-                  fontSize: 11,
-                  color: colors.primaryDark,
-                  fontWeight: "600",
-                }}
-              >
-                โหมดสาธิต • ข้อมูลสมมติ
-              </Txt>
+          {(!railOpen || mode === "demo") && (
+            <View style={s.topBar}>
+              {!railOpen && (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="เปิดแถบเมนู"
+                  testID="rail-toggle-open"
+                  onPress={() => setRailOpen(true)}
+                  style={s.openToggle}
+                >
+                  <View style={s.openIcon}>
+                    <Ionicons
+                      name="menu-outline"
+                      size={22}
+                      color={colors.primaryDark}
+                    />
+                  </View>
+                </Pressable>
+              )}
+              {mode === "demo" && (
+                <Txt
+                  style={[
+                    s.demoLabel,
+                    !railOpen && s.demoLabelWithToggle,
+                  ]}
+                >
+                  โหมดสาธิต • ข้อมูลสมมติ
+                </Txt>
+              )}
             </View>
           )}
           {error && (
@@ -153,9 +186,67 @@ const s = StyleSheet.create({
   rail: {
     paddingTop: 22,
     paddingBottom: 12,
-    gap: 14,
-    backgroundColor: "#E8F3FE",
+    gap: 12,
+    backgroundColor: "#EDF6FF",
     borderRightWidth: 1,
+    borderColor: colors.border,
+  },
+  railToggle: {
+    minHeight: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 15,
+  },
+  railToggleIcon: {
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 13,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  accountDivider: {
+    height: 1,
+    marginHorizontal: 5,
+    backgroundColor: colors.border,
+  },
+  topBar: {
+    minHeight: 29,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderBottomWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: "#F0F7FF",
+  },
+  demoLabel: {
+    paddingVertical: 3,
+    paddingHorizontal: 4,
+    fontSize: 11,
+    color: colors.primaryDark,
+    fontWeight: "600",
+  },
+  demoLabelWithToggle: {
+    marginLeft: 6,
+  },
+  openToggle: {
+    width: 48,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 15,
+  },
+  openIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.soft,
+    borderWidth: 1,
     borderColor: colors.border,
   },
   item: {
@@ -170,11 +261,4 @@ const s = StyleSheet.create({
   itemCompact: { minHeight: 68, paddingVertical: 7, gap: 5 },
   active: { backgroundColor: colors.primary },
   pane: { flex: 1, minWidth: 0 },
-  demo: {
-    paddingVertical: 5,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: "#F0F7FF",
-  },
 });
