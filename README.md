@@ -13,13 +13,23 @@ This means the app builds and its tested demo journey works in the listed enviro
 Requires Git, Node.js 24 LTS and npm. Install the exact locked dependencies:
 
 ```sh
-git clone YOUR_GITHUB_REPOSITORY_URL gan-health-companion
+git clone https://github.com/bom70489/Health.git gan-health-companion
 cd gan-health-companion
 npm ci
 npx expo start
 ```
 
-Replace `YOUR_GITHUB_REPOSITORY_URL` with your repository URL. If PowerShell blocks `npm.ps1` or `npx.ps1`, use `npm.cmd` / `npx.cmd`. Open this cloned folder as the Codex workspace; do not scaffold a new app. Demo Mode needs no `.env` or cloud credentials.
+If PowerShell blocks `npm.ps1` or `npx.ps1`, use `npm.cmd` / `npx.cmd`. Open this cloned folder as the Codex workspace; do not scaffold a new app. Demo Mode needs no `.env` or cloud credentials.
+
+## Team branch for Ming
+
+The `ming` branch is the team's starting branch for Ming's work. After cloning, switch to it with:
+
+```sh
+git switch --track origin/ming
+```
+
+Keep new work on `ming` or a feature branch based on it, then open a pull request to `main` when it's ready to review.
 
 Scan the QR code using an Expo Go release compatible with SDK 57, or press `a` with an Android emulator installed. If a matching Expo Go runtime is unavailable, use the development build below. For the browser preview:
 

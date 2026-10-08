@@ -5,13 +5,13 @@ This repository contains the working Expo SDK 57 app, synthetic local demo, Supa
 ## First run
 
 ```sh
-git clone YOUR_GITHUB_REPOSITORY_URL gan-health-companion
+git clone https://github.com/bom70489/Health.git gan-health-companion
 cd gan-health-companion
 npm ci
 npx expo start
 ```
 
-Replace `YOUR_GITHUB_REPOSITORY_URL` with the repository URL. On Windows PowerShell, substitute `npm.cmd` / `npx.cmd` if script policy blocks the standard commands. Open the cloned folder in Codex. No credentials are needed for Demo Mode: select the doctor, manage a patient through Account, then switch to patient A through Account settings. Changes persist locally. See `DEMO_SCRIPT.md`.
+On Windows PowerShell, substitute `npm.cmd` / `npx.cmd` if script policy blocks the standard commands. To work on Ming's team branch, run `git switch --track origin/ming`. Open the cloned folder in Codex. No credentials are needed for Demo Mode: select the doctor, manage a patient through Account, then switch to patient A through Account settings. Changes persist locally. See `DEMO_SCRIPT.md`.
 
 ## Current state
 
