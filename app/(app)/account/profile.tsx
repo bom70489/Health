@@ -16,7 +16,7 @@ export default function ProfileScreen() {
       subtitle="ข้อมูลบัญชีที่ได้รับการลงทะเบียน"
       back
     >
-      <ProfileCard profile={user} />
+      <ProfileCard profile={user} editable />
       <Card>
         <View style={doctorStyles.stack}>
           <Txt style={doctorStyles.section}>ข้อมูลติดต่อ</Txt>

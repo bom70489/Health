@@ -41,7 +41,7 @@ export default function AccountScreen() {
           : "ข้อมูลของคุณและการตั้งค่าการใช้งาน"
       }
     >
-      <ProfileCard profile={user} />
+      <ProfileCard profile={user} editable />
       {user.role === "doctor" ? (
         <>
           <Txt style={doctorStyles.section}>งานสำหรับแพทย์</Txt>

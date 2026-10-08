@@ -25,6 +25,14 @@
       "expo-router",
       "@react-native-community/datetimepicker",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "เลือกรูปโปรไฟล์เพื่อแสดงในบัญชีนี้ เฉพาะบนอุปกรณ์นี้",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-notifications",
         {
           "defaultChannel": "health",

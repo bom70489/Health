@@ -8,6 +8,13 @@ The functional prototype work is complete: demo doctor-to-patient flows, persist
 
 This means the app builds and its tested demo journey works in the listed environments. It does **not** mean it has been verified on every device or is ready for clinical use. The width sweep used a web browser, so physical Android/iOS layouts, native reminders/speech, hosted Supabase authentication and remote push still need the device/cloud checks below.
 
+## Recent UI work
+
+- The left navigation rail can be collapsed and reopened. On narrow phones, the rail uses a compact width; the reopen control is a small menu button in the same top row as the Demo Mode label, instead of a separate full-width header.
+- The Account profile card supports adding, changing and removing the signed-in user's profile photo from the device's photo library. The selected image is cropped and resized for the avatar and stored locally on that device. It is not uploaded to Supabase or shared with other devices.
+- The photo picker requests photo-library access only; camera and microphone permissions are disabled for this feature.
+- Latest checks after the sidebar and profile-photo changes: `npm.cmd run lint` and `npm.cmd run typecheck` pass. These checks do not verify photo picking on a physical Android or iOS device.
+
 ## Clone and run on another laptop
 
 Requires Git, Node.js 24 LTS and npm. Install the exact locked dependencies:
