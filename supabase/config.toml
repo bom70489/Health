@@ -1,0 +1,9 @@
+project_id = "gan-health-companion"
+
+[functions.assistant]
+# Explicit JWT validation with auth.getUser in the function supports current keys.
+verify_jwt = false
+
+[functions.send-reminders]
+# Server cron secret is validated before any privileged work.
+verify_jwt = false
