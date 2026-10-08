@@ -12,6 +12,7 @@ import {
   TextProps,
   View,
   ViewStyle,
+  useWindowDimensions,
 } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -92,6 +93,7 @@ export function Button({
       )}
       <Txt
         style={{
+          flexShrink: 1,
           color: variant === "secondary" ? colors.primaryDark : "white",
           fontWeight: "700",
           textAlign: "center",
@@ -109,7 +111,12 @@ export function Card({
   children: ReactNode;
   style?: ViewStyle;
 }) {
-  return <View style={[styles.card, style]}>{children}</View>;
+  const { width } = useWindowDimensions();
+  return (
+    <View style={[styles.card, width <= 360 && styles.cardCompact, style]}>
+      {children}
+    </View>
+  );
 }
 export function Field({ label, ...props }: TextInputProps & { label: string }) {
   const { fontScale } = useApp();
@@ -141,6 +148,7 @@ export function Page({
   children: ReactNode;
   back?: boolean;
 }) {
+  const { width } = useWindowDimensions();
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -148,7 +156,14 @@ export function Page({
     >
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.page}
+        contentContainerStyle={[
+          styles.page,
+          {
+            paddingHorizontal:
+              width <= 320 ? 10 : width <= 360 ? 12 : width <= 430 ? 14 : 16,
+            gap: width <= 360 ? 11 : 14,
+          },
+        ]}
       >
         {back && (
           <Pressable
@@ -296,7 +311,7 @@ export const styles = StyleSheet.create({
     fontWeight: "800",
     color: colors.text,
   },
-  page: { padding: 16, gap: 14, paddingBottom: 36 },
+  page: { gap: 14, paddingTop: 16, paddingBottom: 36 },
   card: {
     backgroundColor: "white",
     padding: 16,
@@ -305,6 +320,7 @@ export const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 20,
   },
+  cardCompact: { padding: 12, gap: 8 },
   button: {
     minHeight: 48,
     paddingHorizontal: 14,

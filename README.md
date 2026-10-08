@@ -4,9 +4,9 @@ Thai-first Android-first prototype built from [the authoritative master brief](d
 
 ## Completion status
 
-The functional prototype work is complete: demo doctor-to-patient flows, persistent synthetic data, role guards, appointment and medication management, dose self-reporting, calendar tasks and read-only schedule chat are implemented. The latest automated checks are recorded in [TEST_CHECKLIST.md](TEST_CHECKLIST.md): 66 tests pass, typecheck/lint/Expo diagnostics pass, Android/iOS/web bundles export, and the browser journey passes at 360×800.
+The functional prototype work is complete: demo doctor-to-patient flows, persistent synthetic data, role guards, appointment and medication management, dose self-reporting, calendar tasks and read-only schedule chat are implemented. The latest checks are recorded in [TEST_CHECKLIST.md](TEST_CHECKLIST.md): 66 tests pass, typecheck/lint/Expo diagnostics pass, Android/iOS/web bundles export, and the browser journey passes at 360×800. A responsive browser sweep found no page-width overflow at 280, 320, 360, 390, 430 and 480px for the calendar, chat and account screens; doctor appointment and medication forms also fit at 280px.
 
-This means the app builds and its tested demo journey works in the listed environments. It does **not** mean it has been verified on every device or is ready for clinical use. Physical Android/iOS behavior, native reminders/speech, hosted Supabase authentication and remote push still need the device/cloud checks below.
+This means the app builds and its tested demo journey works in the listed environments. It does **not** mean it has been verified on every device or is ready for clinical use. The width sweep used a web browser, so physical Android/iOS layouts, native reminders/speech, hosted Supabase authentication and remote push still need the device/cloud checks below.
 
 ## Clone and run on another laptop
 
