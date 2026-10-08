@@ -23,10 +23,10 @@ Requires Git, Node.js 24 LTS and npm. Install the exact locked dependencies:
 git clone https://github.com/bom70489/Health.git gan-health-companion
 cd gan-health-companion
 npm ci
-npx expo start
+npx expo start --go
 ```
 
-If PowerShell blocks `npm.ps1` or `npx.ps1`, use `npm.cmd` / `npx.cmd`. Open this cloned folder as the Codex workspace; do not scaffold a new app. Demo Mode needs no `.env` or cloud credentials.
+The `--go` flag opens the app in Expo Go, including when the development client is installed in the project. If PowerShell blocks `npm.ps1` or `npx.ps1`, use `npm.cmd` / `npx.cmd`. Open this cloned folder as the Codex workspace; do not scaffold a new app. Demo Mode needs no `.env` or cloud credentials.
 
 ## Team branch for Ming
 
